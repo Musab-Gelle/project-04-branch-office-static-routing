@@ -1,0 +1,86 @@
+Project 4 Configuration
+HQ-router-config:
+enable
+configure terminal
+
+hostname HQ-Router
+
+! ---- Inter-VLAN Routing ----
+interface GigabitEthernet0/0
+ no shutdown
+ exit
+
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+ exit
+
+interface GigabitEthernet0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+ exit
+
+interface GigabitEthernet0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+ exit
+
+! ---- WAN Interface ----
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+ exit
+
+! ---- Static Route to Branch ----
+ip route 192.168.40.0 255.255.255.0 10.0.0.2
+
+end
+write memory
+
+
+branch-router-config:
+enable
+configure terminal
+
+hostname Branch-Router
+
+! ---- Branch LAN ----
+interface GigabitEthernet0/0
+ ip address 192.168.40.1 255.255.255.0
+ no shutdown
+ exit
+
+! ---- WAN Interface ----
+interface GigabitEthernet0/1
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+ exit
+
+! ---- Static Routes to HQ VLANs ----
+ip route 192.168.10.0 255.255.255.0 10.0.0.1
+ip route 192.168.20.0 255.255.255.0 10.0.0.1
+ip route 192.168.30.0 255.255.255.0 10.0.0.1
+
+end
+write memory
+
+branch-switch-config:
+enable
+configure terminal
+
+hostname Branch-Switch
+
+! ---- PC Port ----
+interface FastEthernet0/1
+ switchport mode access
+ no shutdown
+ exit
+
+! ---- Router Uplink ----
+interface FastEthernet0/24
+ switchport mode access
+ no shutdown
+ exit
+
+end
+write memory
